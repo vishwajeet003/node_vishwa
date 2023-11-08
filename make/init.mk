@@ -24,6 +24,11 @@ ifeq (, $(GOTOOLCHAIN))
 $(error "GOTOOLCHAIN is not set")
 endif
 
+NULL  :=
+SPACE := $(NULL) #
+COMMA := ,
+
+
 BINS                         := $(AKASH)
 
 GO                           := GO111MODULE=$(GO111MODULE) go

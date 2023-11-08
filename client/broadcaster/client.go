@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	aclient "github.com/akash-network/akash-api/go/node/client/v1beta2"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -16,18 +17,13 @@ var (
 	ErrBroadcastTx = errors.New("broadcast tx error")
 )
 
-//go:generate mockery --name Client --output ./mocks
-type Client interface {
-	Broadcast(ctx context.Context, msgs ...sdk.Msg) error
-}
-
 type simpleClient struct {
 	cctx sdkclient.Context
 	txf  tx.Factory
 	info keyring.Info
 }
 
-func NewClient(cctx sdkclient.Context, txf tx.Factory, info keyring.Info) Client {
+func NewClient(cctx sdkclient.Context, txf tx.Factory, info keyring.Info) aclient.Tx {
 	return &simpleClient{
 		cctx: cctx,
 		txf:  txf,

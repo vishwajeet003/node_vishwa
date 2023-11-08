@@ -3,21 +3,22 @@ package cli
 import (
 	"context"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 
 	types "github.com/akash-network/akash-api/go/node/deployment/v1beta3"
+
+	"github.com/akash-network/node/client"
 )
 
 // GetQueryCmd returns the query commands for the deployment module
 func GetQueryCmd() *cobra.Command {
-
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Deployment query commands",
 		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
+		RunE:                       sdkclient.ValidateCmd,
 	}
 
 	cmd.AddCommand(
@@ -35,19 +36,17 @@ func cmdDeployments() *cobra.Command {
 		Short: "Query for all deployments",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
+			qq, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			queryClient := types.NewQueryClient(clientCtx)
 
 			dfilters, err := DepFiltersFromFlags(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			pageReq, err := sdkclient.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -57,12 +56,12 @@ func cmdDeployments() *cobra.Command {
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.Deployments(context.Background(), params)
+			res, err := qq.Deployments(context.Background(), params)
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(res)
+			return qq.ClientContext().PrintProto(res)
 		},
 	}
 
@@ -79,24 +78,22 @@ func cmdDeployment() *cobra.Command {
 		Short: "Query deployment",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
+			qq, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			queryClient := types.NewQueryClient(clientCtx)
 
 			id, err := DeploymentIDFromFlags(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			res, err := queryClient.Deployment(context.Background(), &types.QueryDeploymentRequest{ID: id})
+			res, err := qq.Deployment(context.Background(), &types.QueryDeploymentRequest{ID: id})
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(res)
+			return qq.ClientContext().PrintProto(res)
 		},
 	}
 
@@ -112,7 +109,7 @@ func getGroupCmd() *cobra.Command {
 		Use:                        "group",
 		Short:                      "Deployment group query commands",
 		SuggestionsMinimumDistance: 2,
-		RunE:                       client.ValidateCmd,
+		RunE:                       sdkclient.ValidateCmd,
 	}
 
 	cmd.AddCommand(
@@ -128,24 +125,22 @@ func cmdGetGroup() *cobra.Command {
 		Short: "Query group of deployment",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
+			qq, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			queryClient := types.NewQueryClient(clientCtx)
 
 			id, err := GroupIDFromFlags(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			res, err := queryClient.Group(context.Background(), &types.QueryGroupRequest{ID: id})
+			res, err := qq.Group(cmd.Context(), &types.QueryGroupRequest{ID: id})
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(&res.Group)
+			return qq.ClientContext().PrintProto(&res.Group)
 		},
 	}
 

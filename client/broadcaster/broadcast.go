@@ -92,7 +92,6 @@ func BroadcastTX(ctx context.Context, cctx sdkclient.Context, flags *pflag.FlagS
 	}
 
 	return cctx.PrintProto(res)
-
 }
 
 // PrepareFactory has been copied from cosmos-sdk to make it public.

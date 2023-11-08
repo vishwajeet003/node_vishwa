@@ -1,13 +1,13 @@
 package cli
 
 import (
-	"context"
-
-	"github.com/cosmos/cosmos-sdk/client"
+	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 
 	types "github.com/akash-network/akash-api/go/node/market/v1beta4"
+
+	"github.com/akash-network/node/client"
 )
 
 func cmdGetBids() *cobra.Command {
@@ -15,19 +15,17 @@ func cmdGetBids() *cobra.Command {
 		Use:   "list",
 		Short: "Query for all bids",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
+			qq, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			queryClient := types.NewQueryClient(clientCtx)
 
 			bfilters, err := BidFiltersFromFlags(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			pageReq, err := client.ReadPageRequest(cmd.Flags())
+			pageReq, err := sdkclient.ReadPageRequest(cmd.Flags())
 			if err != nil {
 				return err
 			}
@@ -37,12 +35,12 @@ func cmdGetBids() *cobra.Command {
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.Bids(context.Background(), params)
+			res, err := qq.Bids(cmd.Context(), params)
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(res)
+			return qq.ClientContext().PrintProto(res)
 		},
 	}
 
@@ -58,24 +56,22 @@ func cmdGetBid() *cobra.Command {
 		Short: "Query order",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
+			qq, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			queryClient := types.NewQueryClient(clientCtx)
 
 			bidID, err := BidIDFromFlags(cmd.Flags())
 			if err != nil {
 				return err
 			}
 
-			res, err := queryClient.Bid(context.Background(), &types.QueryBidRequest{ID: bidID})
+			res, err := qq.Bid(cmd.Context(), &types.QueryBidRequest{ID: bidID})
 			if err != nil {
 				return err
 			}
 
-			return clientCtx.PrintProto(res)
+			return qq.ClientContext().PrintProto(res)
 		},
 	}
 

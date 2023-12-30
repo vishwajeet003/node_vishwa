@@ -1,4 +1,4 @@
-# Akash - Decentralized Serverless Network
+# Awale Vishwwajeet Bapurao - Decentralized Serverless Network
 
 ![tests](https://github.com/akash-network/node/workflows/tests/badge.svg)
 [![codecov](https://codecov.io/github/akash-network/node/coverage.svg?branch=main)](https://codecov.io/github/akash-network/node?branch=main)
